@@ -10,8 +10,16 @@ class bcolors:
 
 class KubaGame:
     def __init__(self, player1_info, player2_info):
-        self._p1 = {'name': player1_info[0], 'color': player1_info[1]}
-        self._p2 = {'name': player2_info[0], 'color': player2_info[1]}
+        self._p1 = {
+            'name': player1_info[0],
+            'color': player1_info[1],
+            'captured_count': 0
+        }
+        self._p2 = {
+            'name': player2_info[0],
+            'color': player2_info[1],
+            'captured_count': 0
+        }
         self._turn = None
         self._board = [
             ['W', 'W', ' ', ' ', ' ', 'B', 'B'],
@@ -22,7 +30,6 @@ class KubaGame:
             ['B', 'B', ' ', 'R', ' ', 'W', 'W'],
             ['B', 'B', ' ', ' ', ' ', 'W', 'W'],
         ]
-
 
     def _display_board(self, colored=False):
         if not colored:
@@ -71,7 +78,10 @@ class KubaGame:
         pass
 
     def get_captured(self, player_name):
-        pass
+        if player_name == self._p1.get('name'):
+            return self._p1.get('captured_count')
+        elif player_name == self._p2.get('name'):
+            return self._p2.get('captured_count')
 
     def get_marble(self, coordinates):
         marble = self._board[coordinates[0]][coordinates[1]]
