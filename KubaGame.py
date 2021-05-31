@@ -2,25 +2,26 @@
 # Date        : 2021-05-24
 # Description : Contains a class called KubaGame for playing a game of Kuba
 
-class bcolors:
-    CBLACKBG  = '\33[40m'
-    CWHITEBG  = '\33[47m'
-    CREDBG    = '\33[41m'
-    ENDC = '\033[0m'
+class Colors:
+    BLACKBG  = '\33[40m'
+    WHITEBG  = '\33[47m'
+    REDBG    = '\33[41m'
+    ENDC     = '\033[0m'
 
 class KubaGame:
     def __init__(self, player1_info, player2_info):
-        self._p1 = {
-            'name': player1_info[0],
-            'color': player1_info[1],
-            'captured_count': 0
-        }
-        self._p2 = {
-            'name': player2_info[0],
-            'color': player2_info[1],
-            'captured_count': 0
+        self._player_info = {
+            player1_info[0]: {
+                'color': player1_info[1],
+                'captured_count': 0
+            },
+            player2_info[0]: {
+                'color': player2_info[1],
+                'captured_count': 0
+            }
         }
         self._turn = None
+        self._winner = None
         self._board = [
             ['W', 'W', ' ', ' ', ' ', 'B', 'B'],
             ['W', 'W', ' ', 'R', ' ', 'B', 'B'],
@@ -44,11 +45,11 @@ class KubaGame:
             new_row = []
             for column in row:
                 if column == 'W':
-                    new_row.append(bcolors.CWHITEBG + 'W' + bcolors.ENDC)
+                    new_row.append(Colors.WHITEBG + 'W' + Colors.ENDC)
                 elif column == 'B':
-                    new_row.append(bcolors.CBLACKBG + 'B' + bcolors.ENDC)
+                    new_row.append(Colors.BLACKBG + 'B' + Colors.ENDC)
                 elif column == 'R':
-                    new_row.append(bcolors.CREDBG + 'R' + bcolors.ENDC)
+                    new_row.append(Colors.REDBG + 'R' + Colors.ENDC)
                 else:
                     new_row.append(' ')
             new_board.append(new_row)
@@ -61,27 +62,61 @@ class KubaGame:
         return self._turn
 
     def make_move(self, player_name, coordinates, direction):
-        players_turn = self.get_current_turn()
-        if players_turn is None:
+        """
+        :param player_name: Name of the player used to initially create the
+                            object
+
+        :param coordinates: Tuple of coordinates of the board (x, y) of the
+                            marble to push. Indices x and y range from 0 to 7.
+
+        :param direction:   Direction to push the balls. Valid options are 'L'
+                            (left), 'R' (right), 'F' (forward), and 'B' (back).
+
+        :return Boolean:    True if the move is made and False if the move is
+                            invalid (i.e. make_move did not do anything).
+        """
+        players_turn = self._turn
+        if players_turn is None:    # First move of the game
             players_turn = player_name
-        elif players_turn != player_name:
+        bonus_turn = False          # set to True if a ball is knocked off
+        ball_color = self._board[coordinates[0]][coordinates[1]]
+        player = self._player_info[player_name]
+
+        # Check to see if the move is valid
+        if players_turn != player_name:     # Trying to make_move out of turn
+            return False
+        if self._winner != None:            # A player has already won
+            return False
+        for coordinate in coordinates:      # The coordinates are out of range
+            if coordinate not in range(7):
+                return False
+        if ball_color != player['color']:   # Can only push using players balls
             return False
 
-        if player_name == self._p1['name']:
-            self._turn = self._p2['name']
-        elif player_name == self._p2['name']:
-            self._turn = self._p1['name']
+        if direction == 'R':
+            pass
+        elif direction == 'L':
+            pass
+        elif direction == 'B':
+            pass
+        elif direction == 'F':
+            pass
 
         return True
 
+    def get_opponent_name(self, player_name):
+        players = list(self._player_info.keys())
+        index = players.index(player_name)
+        if index == 0:
+            return players[1]
+        else:
+            return players[0]
+
     def get_winner(self):
-        pass
+        return self._winner
 
     def get_captured(self, player_name):
-        if player_name == self._p1.get('name'):
-            return self._p1.get('captured_count')
-        elif player_name == self._p2.get('name'):
-            return self._p2.get('captured_count')
+        return self._player_info[player_name].get('captured_count')
 
     def get_marble(self, coordinates):
         marble = self._board[coordinates[0]][coordinates[1]]
@@ -99,6 +134,7 @@ class KubaGame:
         return W, B, R
 
 if __name__ == '__main__':
-    game = KubaGame(('Jim', 'W'), ('Bob', 'B'))
+    game = KubaGame(('ann', 'W'), ('bob', 'B'))
     game._display_board(colored=True)
     print('marble count', game.get_marble_count())
+    print(game.make_move('ann', (3, 4), 'R'))
