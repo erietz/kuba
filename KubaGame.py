@@ -142,7 +142,18 @@ class KubaGame:
             self._board[row][col] = ' '
 
         elif direction == 'L':
-            pass
+            rev_col = 7 - col - 1
+            try:
+                last = self._board[row][::-1].index(' ', rev_col + 1, 6) - 1
+                last = 7 - last - 1     # want index of list not reversed list
+            except ValueError:
+                last = 1
+                player['captured_count'] += 1
+                bonus_turn = True
+
+            self._board[row][last-1:col] = self._board[row][last:col+1]
+            self._board[row][col] = ' '
+
         elif direction == 'B':
             pass
         elif direction == 'F':
@@ -185,6 +196,18 @@ if __name__ == '__main__':
     game = KubaGame(('ann', 'W'), ('bob', 'B'))
     game._display_board(colored=True)
     print('marble count', game.get_marble_count())
+
+    # game.make_move('ann', (5, 6), 'L')
+    # game._display_board(colored=True)
+    # game.make_move('bob', (6, 0), 'R')
+    # game._display_board(colored=True)
+    # game.make_move('ann', (5, 5), 'L')
+    # game._display_board(colored=True)
+    # game.make_move('bob', (6, 1), 'R')
+    # game._display_board(colored=True)
+    # game.make_move('ann', (5, 4), 'L')
+    # game._display_board(colored=True)
+
     print(game.make_move('ann', (0,0), 'R'))
     game._display_board(colored=True)
     print(game.make_move('bob', (6,0), 'R'))
@@ -206,3 +229,4 @@ if __name__ == '__main__':
     game._display_board(colored=True)
     print('ann captured', game.get_captured('ann'))
     print('bob captured', game.get_captured('bob'))
+
