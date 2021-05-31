@@ -2,6 +2,7 @@ import unittest
 from KubaGame import KubaGame
 
 class TestReadme(unittest.TestCase):
+
     def test_readme_example(self):
         game = KubaGame(('PlayerA', 'W'), ('PlayerB', 'B'))
         self.assertEqual(game.get_marble_count(), (8,8,13))
@@ -24,9 +25,25 @@ class TestReadme(unittest.TestCase):
         game._display_board(colored=True)
         self.assertTrue(game.make_move('bob', (6, 0), 'F'))
         self.assertTrue(game.make_move('ann', (1, 3), 'B'))
-        #self.assertTrue(game.get_captured('ann', 1))
-        #self.assertTrue(game.make_move('ann', (2, 3), 'B'))
-        #$self.assertTrue(game.get_captured('ann', 2))
+        self.assertTrue(game.get_captured('ann'), 1)
+        self.assertTrue(game.make_move('ann', (2, 3), 'B'))
+        self.assertTrue(game.get_captured('ann'), 2)
+        self.assertTrue(game.make_move('ann', (3, 3), 'B'))
+        self.assertTrue(game.get_captured('ann'), 3)
+        self.assertTrue(game.make_move('ann', (4, 3), 'B'))
+        self.assertTrue(game.get_captured('ann'), 4)
+        self.assertTrue(game.make_move('ann', (5, 3), 'B'))
+        self.assertTrue(game.get_captured('ann'), 5)
+        self.assertTrue(game.make_move('ann', (1, 0), 'R'))
+        self.assertTrue(game.make_move('bob', (4, 0), 'B'))
+        self.assertTrue(game.make_move('ann', (0, 2), 'B'))
+        self.assertTrue(game.make_move('bob', (6, 0), 'F'))
+        self.assertTrue(game.make_move('ann', (1, 2), 'B'))
+        self.assertTrue(game.make_move('bob', (4, 0), 'B'))
+        self.assertTrue(game.make_move('ann', (2, 2), 'B'))
+        self.assertEqual(game.get_winner(), None)
+        self.assertTrue(game.make_move('ann', (3, 2), 'B'))
+        self.assertEqual(game.get_winner(), 'ann')
 
     def test_transpose_matrix(self):
         game = KubaGame(('ann', 'W'), ('bob', 'B'))

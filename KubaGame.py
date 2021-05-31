@@ -77,6 +77,7 @@ class KubaGame:
         """
         players_turn = self._turn
         if players_turn is None:    # First move of the game
+            self._turn = player_name
             players_turn = player_name
         row, col = coordinates[0], coordinates[1]   # To reduce typing and brain power
         ball_color = self._board[row][col]
@@ -155,6 +156,7 @@ class KubaGame:
             self._board[row][col] = ' '
 
         elif direction == 'B':
+            row, col = col, row
             tmp_board = self._transpose_matrix(self._board)
             try:
                 last = tmp_board[row].index(' ', col + 1) - 1
@@ -169,6 +171,7 @@ class KubaGame:
 
         elif direction == 'F':
             tmp_board = self._transpose_matrix(self._board)
+            row, col = col, row
             rev_col = 7 - col - 1
             try:
                 last = tmp_board[row][::-1].index(' ', rev_col + 1) - 1
@@ -181,6 +184,8 @@ class KubaGame:
             tmp_board[row][last-1:col] = tmp_board[row][last:col+1]
             tmp_board[row][col] = ' '
             self._board = self._transpose_matrix(tmp_board)
+
+        self._update_winner_state()
 
         if not bonus_turn:
             self._turn = self._get_opponent_name(player_name)
@@ -203,6 +208,13 @@ class KubaGame:
         else:
             return players[0]
 
+    def _update_winner_state(self):
+        marble_count = self.get_marble_count()
+        if self._player_info[self._turn]['captured_count'] == 7:
+            self._winner = self._turn
+        elif marble_count[0] == 0 or marble_count[2] == 0:
+            self._winner = self._turn
+
     def get_winner(self):
         return self._winner
 
@@ -217,6 +229,9 @@ class KubaGame:
             return marble
 
     def get_marble_count(self):
+        """
+        Returns tuple of (W, B, R) counts on the board
+        """
         W, B, R = 0, 0, 0
         for row in self._board:
             W += row.count('W')
