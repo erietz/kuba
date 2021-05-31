@@ -34,9 +34,13 @@ class KubaGame:
 
     def _display_board(self, colored=False):
         if not colored:
+            i = 0
+            print(' ', *list(range(7)), sep=' ')
             for row in self._board:
+                print(i, end=' ')
                 for column in row:
                     print(column, end=' ')
+                i +=1
                 print()
             return
 
@@ -53,10 +57,19 @@ class KubaGame:
                 else:
                     new_row.append(' ')
             new_board.append(new_row)
+
+        print('  ', '-'*16)
+        print(' ', '|', *list(range(7)), '|', sep=' ')
+        print('  ', '-'*16)
+        i = 0
         for row in new_board:
+            print(i, '|', end=' ')
             for column in row:
                 print(column, end=' ')
+            i += 1
+            print('|', end=' ')
             print()
+        print('  ', '-'*16)
 
     def get_current_turn(self):
         return self._turn
