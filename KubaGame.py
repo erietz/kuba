@@ -78,11 +78,12 @@ class KubaGame:
         players_turn = self._turn
         if players_turn is None:    # First move of the game
             players_turn = player_name
-        bonus_turn = False          # set to True if a ball is knocked off
-        ball_color = self._board[coordinates[0]][coordinates[1]]
+        x, y = coordinates[0], coordinates[1]   # To reduce typing and brain power
+        ball_color = self._board[x][y]
         player = self._player_info[player_name]
+        bonus_turn = False          # Set to True if a ball is knocked off
 
-        # Check to see if the move is valid
+        # Check to see if the move is valid-------------------------------------
         if players_turn != player_name:     # Trying to make_move out of turn
             return False
         if self._winner != None:            # A player has already won
@@ -93,14 +94,28 @@ class KubaGame:
         if ball_color != player['color']:   # Can only push using players balls
             return False
 
+        # There is a ball in front of the ball trying to be pushed
+        if direction == 'R' and x in range(1, 7):
+            if self._board[x - 1][y] != ' ':
+                return False
+        elif direction == 'L' and x in range(6):
+            if self._board[x + 1][y] != ' ':
+                return False
+        elif direction == 'B' and y in range(1, 7):
+            if self._board[x][y - 1] != ' ':
+                return False
+        elif direction == 'F' and y in range(6):
+            if self._board[x][y + 1] != ' ':
+                return False
+        #-----------------------------------------------------------------------
+
+        # TODO make it so a move can't be made to push ones own marble off
         if direction == 'R':
-            pass
+
+
         elif direction == 'L':
-            pass
         elif direction == 'B':
-            pass
         elif direction == 'F':
-            pass
 
         return True
 
