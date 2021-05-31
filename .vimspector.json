@@ -1,0 +1,14 @@
+{
+  "configurations": {
+    "foo": {
+      "adapter": "debugpy",
+      "configuration": {
+        "name": "foo bar baz",
+        "type": "python",
+        "request": "launch",
+        "python": "/usr/bin/python3",
+        "program": "./test_KubaGame.py"
+      }
+    }
+  }
+}

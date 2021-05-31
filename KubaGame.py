@@ -78,12 +78,15 @@ class KubaGame:
         players_turn = self._turn
         if players_turn is None:    # First move of the game
             players_turn = player_name
-        x, y = coordinates[0], coordinates[1]   # To reduce typing and brain power
-        ball_color = self._board[x][y]
+        row, col = coordinates[0], coordinates[1]   # To reduce typing and brain power
+        ball_color = self._board[row][col]
         player = self._player_info[player_name]
+        opponent = self._player_info[self._get_opponent_name(player_name)]
         bonus_turn = False          # Set to True if a ball is knocked off
 
-        # Check to see if the move is valid-------------------------------------
+        #-----------------------------------------------------------------------
+        # Check to see if the move is valid
+        #-----------------------------------------------------------------------
         if players_turn != player_name:     # Trying to make_move out of turn
             return False
         if self._winner != None:            # A player has already won
@@ -95,31 +98,61 @@ class KubaGame:
             return False
 
         # There is a ball in front of the ball trying to be pushed
-        if direction == 'R' and x in range(1, 7):
-            if self._board[x - 1][y] != ' ':
-                return False
-        elif direction == 'L' and x in range(6):
-            if self._board[x + 1][y] != ' ':
-                return False
-        elif direction == 'B' and y in range(1, 7):
-            if self._board[x][y - 1] != ' ':
-                return False
-        elif direction == 'F' and y in range(6):
-            if self._board[x][y + 1] != ' ':
-                return False
-        #-----------------------------------------------------------------------
-
-        # TODO make it so a move can't be made to push ones own marble off
         if direction == 'R':
+            # Trying to push off ones own ball
+            if self._board[row][6] == player['color']:
+                return False
+            # Ball is blocked by another ball
+            if col in range(1, 7) and self._board[row][col- 1] != ' ':
+                return False
+        elif direction == 'L':
+            # Trying to push off ones own ball
+            if self._board[row][0] == player['color']:
+                return False
+            # Ball is blocked by another ball
+            if col in range(6) and self._board[row][col + 1] != ' ':
+                return False
+        elif direction == 'B':
+            # Trying to push off ones own ball
+            if self._board[6][col] == player['color']:
+                return False
+            # Ball is blocked by another ball
+            if row in range(1, 7) and self._board[row - 1][col] != ' ':
+                return False
+        elif direction == 'F':
+            # Trying to push off ones own ball
+            if self._board[0][col] == player['color']:
+                return False
+            # Ball is blocked by another ball
+            if row in range(6) and self._board[row + 1][col] != ' ':
+                return False
 
+        #-----------------------------------------------------------------------
+        # Move is valid so update the board and states of the game
+        #-----------------------------------------------------------------------
+        if direction == 'R':
+            try:
+                last = self._board[row].index(' ', col + 1, 6) - 1
+            except ValueError:
+                last = 5
+                player['captured_count'] += 1
+                bonus_turn = True
+
+            self._board[row][col+1:last+2] = self._board[row][col:last+1]
+            self._board[row][col] = ' '
 
         elif direction == 'L':
+            pass
         elif direction == 'B':
+            pass
         elif direction == 'F':
+            pass
 
+        if not bonus_turn:
+            self._turn = self._get_opponent_name(player_name)
         return True
 
-    def get_opponent_name(self, player_name):
+    def _get_opponent_name(self, player_name):
         players = list(self._player_info.keys())
         index = players.index(player_name)
         if index == 0:
@@ -152,4 +185,24 @@ if __name__ == '__main__':
     game = KubaGame(('ann', 'W'), ('bob', 'B'))
     game._display_board(colored=True)
     print('marble count', game.get_marble_count())
-    print(game.make_move('ann', (3, 4), 'R'))
+    print(game.make_move('ann', (0,0), 'R'))
+    game._display_board(colored=True)
+    print(game.make_move('bob', (6,0), 'R'))
+    game._display_board(colored=True)
+    print(game.make_move('ann', (0,1), 'R'))
+    game._display_board(colored=True)
+    print(game.make_move('bob', (6,1), 'R'))
+    game._display_board(colored=True)
+    print(game.make_move('ann', (0,2), 'R'))
+    game._display_board(colored=True)
+    print(game.make_move('bob', (6,2), 'R'))
+    game._display_board(colored=True)
+    print(game.make_move('ann', (0,3), 'R'))
+    game._display_board(colored=True)
+    print(game.make_move('bob', (6,3), 'R'))
+    game._display_board(colored=True)
+    print('ann captured', game.get_captured('ann'))
+    game.make_move('ann', (0,4), 'R')
+    game._display_board(colored=True)
+    print('ann captured', game.get_captured('ann'))
+    print('bob captured', game.get_captured('bob'))

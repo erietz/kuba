@@ -17,3 +17,6 @@ class TestReadme(unittest.TestCase):
     def test_easiest_win(self):
         game = KubaGame(('ann', 'W'), ('bob', 'B'))
         self.assertTrue(game.make_move('ann', (0, 0), 'R'))
+
+if __name__ == '__main__':
+    unittest.main()
