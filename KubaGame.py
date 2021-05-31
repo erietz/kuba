@@ -132,7 +132,7 @@ class KubaGame:
         #-----------------------------------------------------------------------
         if direction == 'R':
             try:
-                last = self._board[row].index(' ', col + 1, 6) - 1
+                last = self._board[row].index(' ', col + 1) - 1
             except ValueError:
                 last = 5
                 player['captured_count'] += 1
@@ -144,7 +144,7 @@ class KubaGame:
         elif direction == 'L':
             rev_col = 7 - col - 1
             try:
-                last = self._board[row][::-1].index(' ', rev_col + 1, 6) - 1
+                last = self._board[row][::-1].index(' ', rev_col + 1) - 1
                 last = 7 - last - 1     # want index of list not reversed list
             except ValueError:
                 last = 1
@@ -155,13 +155,45 @@ class KubaGame:
             self._board[row][col] = ' '
 
         elif direction == 'B':
-            pass
+            tmp_board = self._transpose_matrix(self._board)
+            try:
+                last = tmp_board[row].index(' ', col + 1) - 1
+            except ValueError:
+                last = 5
+                player['captured_count'] += 1
+                bonus_turn = True
+
+            tmp_board[row][col+1:last+2] = tmp_board[row][col:last+1]
+            tmp_board[row][col] = ' '
+            self._board = self._transpose_matrix(tmp_board)
+
         elif direction == 'F':
-            pass
+            tmp_board = self._transpose_matrix(self._board)
+            rev_col = 7 - col - 1
+            try:
+                last = tmp_board[row][::-1].index(' ', rev_col + 1) - 1
+                last = 7 - last - 1     # want index of list not reversed list
+            except ValueError:
+                last = 1
+                player['captured_count'] += 1
+                bonus_turn = True
+
+            tmp_board[row][last-1:col] = tmp_board[row][last:col+1]
+            tmp_board[row][col] = ' '
+            self._board = self._transpose_matrix(tmp_board)
 
         if not bonus_turn:
             self._turn = self._get_opponent_name(player_name)
         return True
+
+    def _transpose_matrix(self, matrix):
+        new_matrix = []
+        for j in range(len(matrix[0])):
+            new_row = []
+            for i in range(len(matrix)):
+                new_row.append(matrix[i][j])
+            new_matrix.append(new_row)
+        return new_matrix
 
     def _get_opponent_name(self, player_name):
         players = list(self._player_info.keys())
@@ -229,4 +261,3 @@ if __name__ == '__main__':
     game._display_board(colored=True)
     print('ann captured', game.get_captured('ann'))
     print('bob captured', game.get_captured('bob'))
-

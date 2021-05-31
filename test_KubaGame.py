@@ -17,6 +17,44 @@ class TestReadme(unittest.TestCase):
     def test_easiest_win(self):
         game = KubaGame(('ann', 'W'), ('bob', 'B'))
         self.assertTrue(game.make_move('ann', (0, 0), 'R'))
+        self.assertTrue(game.make_move('bob', (6, 0), 'R'))
+        self.assertTrue(game.make_move('ann', (0, 1), 'R'))
+        self.assertTrue(game.make_move('bob', (6, 2), 'L'))
+        self.assertTrue(game.make_move('ann', (0, 3), 'B'))
+        game._display_board(colored=True)
+        self.assertTrue(game.make_move('bob', (6, 0), 'F'))
+        self.assertTrue(game.make_move('ann', (1, 3), 'B'))
+        #self.assertTrue(game.get_captured('ann', 1))
+        #self.assertTrue(game.make_move('ann', (2, 3), 'B'))
+        #$self.assertTrue(game.get_captured('ann', 2))
+
+    def test_transpose_matrix(self):
+        game = KubaGame(('ann', 'W'), ('bob', 'B'))
+        matrix = [
+            [1, 2],
+            [3, 4],
+            [5, 6],
+        ]
+        new_matrix = [
+            [1, 3, 5],
+            [2, 4, 6]
+        ]
+
+        self.assertEqual(new_matrix, game._transpose_matrix(matrix))
+
+        matrix = [
+            [1, 2, 3],
+            [3, 4, 5],
+            [7, 8, 9]
+        ]
+        new_matrix = [
+            [1, 3, 7],
+            [2, 4, 8],
+            [3, 5, 9]
+        ]
+        self.assertEqual(new_matrix, game._transpose_matrix(matrix))
+        self.assertEqual(game._transpose_matrix(new_matrix), matrix)
+
 
 if __name__ == '__main__':
     unittest.main()

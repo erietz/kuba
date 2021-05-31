@@ -7,7 +7,7 @@
         "type": "python",
         "request": "launch",
         "python": "/usr/bin/python3",
-        "program": "./KubaGame.py"
+        "program": "./test_KubaGame.py"
       }
     }
   }
