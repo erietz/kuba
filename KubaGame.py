@@ -94,7 +94,10 @@ class KubaGame:
             players_turn = player_name
         row, col = coordinates[0], coordinates[1]   # To reduce typing and brain power
         ball_color = self._board[row][col]
-        player = self._player_info[player_name]
+        try:
+            player = self._player_info[player_name]
+        except KeyError:
+            return False
         opponent = self._player_info[self._get_opponent_name(player_name)]
         bonus_turn = False          # Set to True if a ball is knocked off
 
@@ -149,7 +152,8 @@ class KubaGame:
                 last = self._board[row].index(' ', col + 1) - 1
             except ValueError:
                 last = 5
-                player['captured_count'] += 1
+                if self._board[row][6] == 'R':
+                    player['captured_count'] += 1
                 bonus_turn = True
 
             self._board[row][col+1:last+2] = self._board[row][col:last+1]
@@ -162,7 +166,8 @@ class KubaGame:
                 last = 7 - last - 1     # want index of list not reversed list
             except ValueError:
                 last = 1
-                player['captured_count'] += 1
+                if self._board[row][0] == 'R':
+                    player['captured_count'] += 1
                 bonus_turn = True
 
             self._board[row][last-1:col] = self._board[row][last:col+1]
@@ -175,7 +180,8 @@ class KubaGame:
                 last = tmp_board[row].index(' ', col + 1) - 1
             except ValueError:
                 last = 5
-                player['captured_count'] += 1
+                if self._board[row][6] == 'R':
+                    player['captured_count'] += 1
                 bonus_turn = True
 
             tmp_board[row][col+1:last+2] = tmp_board[row][col:last+1]
@@ -191,7 +197,8 @@ class KubaGame:
                 last = 7 - last - 1     # want index of list not reversed list
             except ValueError:
                 last = 1
-                player['captured_count'] += 1
+                if self._board[row][0] == 'R':
+                    player['captured_count'] += 1
                 bonus_turn = True
 
             tmp_board[row][last-1:col] = tmp_board[row][last:col+1]
