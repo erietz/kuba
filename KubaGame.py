@@ -2,6 +2,7 @@
 # Date        : 2021-05-24
 # Description : Contains a class called KubaGame for playing a game of Kuba
 
+# TODO: DO NOT ALLOW PLAYERS TO GET ANOTHER TURN!!!!!
 # TODO: player currently wins game by getting 7 total balls (R or opponent)
 # TODO: prevent player from reversing opponents move
 # TODO: clean up the make_move function so less redundant code
