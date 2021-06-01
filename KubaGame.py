@@ -2,6 +2,14 @@
 # Date        : 2021-05-24
 # Description : Contains a class called KubaGame for playing a game of Kuba
 
+# TODO: player currently wins game by getting 7 total balls (R or opponent)
+# TODO: prevent player from reversing opponents move
+# TODO: clean up the make_move function so less redundant code
+# TODO: write unittests for each method 
+# TODO: make the Colors class part of KubaGame
+# TODO: print row and col numbers on non-colored display board
+# TODO: check all requirements in README
+
 class Colors:
     BLACKBG  = '\33[40m'
     WHITEBG  = '\33[47m'

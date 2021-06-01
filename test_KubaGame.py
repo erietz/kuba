@@ -1,6 +1,10 @@
 import unittest
 from KubaGame import KubaGame
 
+# TODO: Case where white knocks off all black balls and vice versa
+# TODO: Case where there are no valid moves left for a player
+# TODO: Case where the opponent cannot counteract a move indefinitely
+
 class TestReadme(unittest.TestCase):
 
     def test_readme_example(self):
