@@ -9,7 +9,7 @@ game = KubaGame((p1_name, p1_color), (p2_name, p2_color))
 game._display_board(colored=True)
 
 def get_name():
-    name = input('name: ')
+    name = input('name: ').strip()
     names = (p1_name, p2_name)
     if name not in names:
         print('name should be one of ', *names)
@@ -30,7 +30,7 @@ def get_coordinates():
     return coords
 
 def get_direction():
-    direction = input('direction: ').upper()
+    direction = input('direction: ').strip().upper()
     directions = ('R', 'L', 'F', 'B')
     if direction not in directions:
         print('Valid directions are', *directions)
