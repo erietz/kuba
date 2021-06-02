@@ -12,13 +12,30 @@
 # TODO: check all requirements in README
 
 class Colors:
+    """Contains labels for escape sequences to print strings in color"""
     BLACKBG  = '\33[40m'
     WHITEBG  = '\33[47m'
     REDBG    = '\33[41m'
     ENDC     = '\033[0m'
 
 class KubaGame:
+    """
+    Represents a game of Kuba. This class has data members to represent the
+    board and players for a Kuba game. This class also contains all of the
+    methods required to make moves, keep track of the current state, and play
+    the game from start to finish.
+    """
     def __init__(self, player1_info, player2_info):
+        """
+        Creates a new game of Kuba with a 7x7 board set up with marbles in the
+        correct locations. Two players are created using the information
+        provided by the arguments player1_info and player2_info.
+
+        :param player1_info: tuple (color, name) of the players color which can
+                             be either 'W' of 'B' and their name. Both are strings.
+
+        :param player2_info: tuple (color, name) same info but for player 2.
+        """
         self._player_info = {
             player1_info[0]: {
                 'color': player1_info[1],
@@ -29,8 +46,8 @@ class KubaGame:
                 'captured_count': 0
             }
         }
-        self._turn = None
-        self._winner = None
+        self._turn = None       # Name of player whose turn it is
+        self._winner = None     # Name of player who wins the game
         self._board = [
             ['W', 'W', ' ', ' ', ' ', 'B', 'B'],
             ['W', 'W', ' ', 'R', ' ', 'B', 'B'],
@@ -42,6 +59,12 @@ class KubaGame:
         ]
 
     def _display_board(self, colored=False):
+        """
+        Prints out the 7x7 board with the rows and column numbers displayed on
+        the left and top respectfully. If colored is set to True, the board is
+        displayed in color. Note: this requires a terminal that excepts the
+        escape codes profided by the Colors class.
+        """
         if not colored:
             i = 0
             print(' ', *list(range(7)), sep=' ')
@@ -81,6 +104,7 @@ class KubaGame:
         print('  ', '-'*16)
 
     def get_current_turn(self):
+        """Returns the players name whose turn it is"""
         return self._turn
 
     def make_move(self, player_name, coordinates, direction):
@@ -221,6 +245,11 @@ class KubaGame:
         return True
 
     def _transpose_matrix(self, matrix):
+        """
+        Takes an iterable of iterables and returns a new iterable of iterables
+        where the rows are now the columns. This is like the transpose of a
+        matrix.
+        """
         new_matrix = []
         for j in range(len(matrix[0])):
             new_row = []
@@ -230,6 +259,7 @@ class KubaGame:
         return new_matrix
 
     def _get_opponent_name(self, player_name):
+        """Returns the name of the player whose turn it is NOT"""
         players = list(self._player_info.keys())
         index = players.index(player_name)
         if index == 0:
@@ -238,6 +268,11 @@ class KubaGame:
             return players[0]
 
     def _update_winner_state(self):
+        """
+        Updates the winner data member if the player makes a move which results
+        in capturing 7 balls or knocking all of their opponents balls off of
+        the board.
+        """
         marble_count = self.get_marble_count()
         if self._player_info[self._turn]['captured_count'] == 7:
             self._winner = self._turn
@@ -245,12 +280,19 @@ class KubaGame:
             self._winner = self._turn
 
     def get_winner(self):
+        """Returns the name of the winner of the game"""
         return self._winner
 
     def get_captured(self, player_name):
+        """Returns the count of the red marbles captured by player_name"""
         return self._player_info[player_name].get('captured_count')
 
     def get_marble(self, coordinates):
+        """
+        Returns the color of the marble located at coordinates
+        :param coordinates: tuple (row, col) where row and column are indices 
+                            between 0 and 6
+        """
         marble = self._board[coordinates[0]][coordinates[1]]
         if marble == ' ':
             return 'X'
@@ -259,7 +301,7 @@ class KubaGame:
 
     def get_marble_count(self):
         """
-        Returns tuple of (W, B, R) counts on the board
+        Returns tuple (W, B, R) of marble counts on the board
         """
         W, B, R = 0, 0, 0
         for row in self._board:
