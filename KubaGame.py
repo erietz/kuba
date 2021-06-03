@@ -18,6 +18,63 @@ class Colors:
     REDBG    = '\33[41m'
     ENDC     = '\033[0m'
 
+class KubaBoard:
+    def __init__(self):
+        self.board = [
+            ['W', 'W', ' ', ' ', ' ', 'B', 'B'],
+            ['W', 'W', ' ', 'R', ' ', 'B', 'B'],
+            [' ', ' ', 'R', 'R', 'R', ' ', ' '],
+            [' ', 'R', 'R', 'R', 'R', 'R', ' '],
+            [' ', ' ', 'R', 'R', 'R', ' ', ' '],
+            ['B', 'B', ' ', 'R', ' ', 'W', 'W'],
+            ['B', 'B', ' ', ' ', ' ', 'W', 'W'],
+        ]
+
+    def display(self, colored=False):
+        """
+        Prints out the 7x7 board with the rows and column numbers displayed on
+        the left and top respectfully. If colored is set to True, the board is
+        displayed in color. Note: this requires a terminal that excepts the
+        escape codes profided by the Colors class.
+        """
+        if not colored:
+            i = 0
+            print(' ', *list(range(7)), sep=' ')
+            for row in self.board:
+                print(i, end=' ')
+                for column in row:
+                    print(column, end=' ')
+                i +=1
+                print()
+            return
+
+        new_board = []
+        for row in self.board:
+            new_row = []
+            for column in row:
+                if column == 'W':
+                    new_row.append(Colors.WHITEBG + 'W' + Colors.ENDC)
+                elif column == 'B':
+                    new_row.append(Colors.BLACKBG + 'B' + Colors.ENDC)
+                elif column == 'R':
+                    new_row.append(Colors.REDBG + 'R' + Colors.ENDC)
+                else:
+                    new_row.append(' ')
+            new_board.append(new_row)
+
+        print('  ', '-'*16)
+        print(' ', '|', *list(range(7)), '|', sep=' ')
+        print('  ', '-'*16)
+        i = 0
+        for row in new_board:
+            print(i, '|', end=' ')
+            for column in row:
+                print(column, end=' ')
+            i += 1
+            print('|', end=' ')
+            print()
+        print('  ', '-'*16)
+
 class KubaGame:
     """
     Represents a game of Kuba. This class has data members to represent the
@@ -48,60 +105,9 @@ class KubaGame:
         }
         self._turn = None       # Name of player whose turn it is
         self._winner = None     # Name of player who wins the game
-        self._board = [
-            ['W', 'W', ' ', ' ', ' ', 'B', 'B'],
-            ['W', 'W', ' ', 'R', ' ', 'B', 'B'],
-            [' ', ' ', 'R', 'R', 'R', ' ', ' '],
-            [' ', 'R', 'R', 'R', 'R', 'R', ' '],
-            [' ', ' ', 'R', 'R', 'R', ' ', ' '],
-            ['B', 'B', ' ', 'R', ' ', 'W', 'W'],
-            ['B', 'B', ' ', ' ', ' ', 'W', 'W'],
-        ]
-
-    def _display_board(self, colored=False):
-        """
-        Prints out the 7x7 board with the rows and column numbers displayed on
-        the left and top respectfully. If colored is set to True, the board is
-        displayed in color. Note: this requires a terminal that excepts the
-        escape codes profided by the Colors class.
-        """
-        if not colored:
-            i = 0
-            print(' ', *list(range(7)), sep=' ')
-            for row in self._board:
-                print(i, end=' ')
-                for column in row:
-                    print(column, end=' ')
-                i +=1
-                print()
-            return
-
-        new_board = []
-        for row in self._board:
-            new_row = []
-            for column in row:
-                if column == 'W':
-                    new_row.append(Colors.WHITEBG + 'W' + Colors.ENDC)
-                elif column == 'B':
-                    new_row.append(Colors.BLACKBG + 'B' + Colors.ENDC)
-                elif column == 'R':
-                    new_row.append(Colors.REDBG + 'R' + Colors.ENDC)
-                else:
-                    new_row.append(' ')
-            new_board.append(new_row)
-
-        print('  ', '-'*16)
-        print(' ', '|', *list(range(7)), '|', sep=' ')
-        print('  ', '-'*16)
-        i = 0
-        for row in new_board:
-            print(i, '|', end=' ')
-            for column in row:
-                print(column, end=' ')
-            i += 1
-            print('|', end=' ')
-            print()
-        print('  ', '-'*16)
+        self._board = KubaBoard()
+        self._board_positions = self._board.board
+        self._debug = False
 
     def get_current_turn(self):
         """Returns the players name whose turn it is"""
@@ -126,7 +132,7 @@ class KubaGame:
             self._turn = player_name
             players_turn = player_name
         row, col = coordinates[0], coordinates[1]   # To reduce typing and brain power
-        ball_color = self._board[row][col]
+        ball_color = self._board_positions[row][col]
         try:
             player = self._player_info[player_name]
         except KeyError:
@@ -150,31 +156,31 @@ class KubaGame:
         # There is a ball in front of the ball trying to be pushed
         if direction == 'R':
             # Trying to push off ones own ball
-            if self._board[row][6] == player['color']:
+            if self._board_positions[row][6] == player['color']:
                 return False
             # Ball is blocked by another ball
-            if col in range(1, 7) and self._board[row][col- 1] != ' ':
+            if col in range(1, 7) and self._board_positions[row][col- 1] != ' ':
                 return False
         elif direction == 'L':
             # Trying to push off ones own ball
-            if self._board[row][0] == player['color']:
+            if self._board_positions[row][0] == player['color']:
                 return False
             # Ball is blocked by another ball
-            if col in range(6) and self._board[row][col + 1] != ' ':
+            if col in range(6) and self._board_positions[row][col + 1] != ' ':
                 return False
         elif direction == 'B':
             # Trying to push off ones own ball
-            if self._board[6][col] == player['color']:
+            if self._board_positions[6][col] == player['color']:
                 return False
             # Ball is blocked by another ball
-            if row in range(1, 7) and self._board[row - 1][col] != ' ':
+            if row in range(1, 7) and self._board_positions[row - 1][col] != ' ':
                 return False
         elif direction == 'F':
             # Trying to push off ones own ball
-            if self._board[0][col] == player['color']:
+            if self._board_positions[0][col] == player['color']:
                 return False
             # Ball is blocked by another ball
-            if row in range(6) and self._board[row + 1][col] != ' ':
+            if row in range(6) and self._board_positions[row + 1][col] != ' ':
                 return False
 
         #-----------------------------------------------------------------------
@@ -182,66 +188,70 @@ class KubaGame:
         #-----------------------------------------------------------------------
         if direction == 'R':
             try:
-                last = self._board[row].index(' ', col + 1) - 1
+                last = self._board_positions[row].index(' ', col + 1) - 1
             except ValueError:
                 last = 5
-                if self._board[row][6] == 'R':
+                if self._board_positions[row][6] == 'R':
                     player['captured_count'] += 1
                 bonus_turn = True
 
-            self._board[row][col+1:last+2] = self._board[row][col:last+1]
-            self._board[row][col] = ' '
+            self._board_positions[row][col+1:last+2] = self._board_positions[row][col:last+1]
+            self._board_positions[row][col] = ' '
 
         elif direction == 'L':
             rev_col = 7 - col - 1
             try:
-                last = self._board[row][::-1].index(' ', rev_col + 1) - 1
+                last = self._board_positions[row][::-1].index(' ', rev_col + 1) - 1
                 last = 7 - last - 1     # want index of list not reversed list
             except ValueError:
                 last = 1
-                if self._board[row][0] == 'R':
+                if self._board_positions[row][0] == 'R':
                     player['captured_count'] += 1
                 bonus_turn = True
 
-            self._board[row][last-1:col] = self._board[row][last:col+1]
-            self._board[row][col] = ' '
+            self._board_positions[row][last-1:col] = self._board_positions[row][last:col+1]
+            self._board_positions[row][col] = ' '
 
         elif direction == 'B':
             row, col = col, row
-            tmp_board = self._transpose_matrix(self._board)
+            tmp_board_positions = self._transpose_matrix(self._board_positions)
             try:
-                last = tmp_board[row].index(' ', col + 1) - 1
+                last = tmp_board_positions[row].index(' ', col + 1) - 1
             except ValueError:
                 last = 5
-                if self._board[row][6] == 'R':
+                if self._board_positions[row][6] == 'R':
                     player['captured_count'] += 1
                 bonus_turn = True
 
-            tmp_board[row][col+1:last+2] = tmp_board[row][col:last+1]
-            tmp_board[row][col] = ' '
-            self._board = self._transpose_matrix(tmp_board)
+            tmp_board_positions[row][col+1:last+2] = tmp_board_positions[row][col:last+1]
+            tmp_board_positions[row][col] = ' '
+            self._board_positions = self._transpose_matrix(tmp_board_positions)
 
         elif direction == 'F':
-            tmp_board = self._transpose_matrix(self._board)
+            tmp_board_positions = self._transpose_matrix(self._board_positions)
             row, col = col, row
             rev_col = 7 - col - 1
             try:
-                last = tmp_board[row][::-1].index(' ', rev_col + 1) - 1
+                last = tmp_board_positions[row][::-1].index(' ', rev_col + 1) - 1
                 last = 7 - last - 1     # want index of list not reversed list
             except ValueError:
                 last = 1
-                if self._board[row][0] == 'R':
+                if self._board_positions[row][0] == 'R':
                     player['captured_count'] += 1
                 bonus_turn = True
 
-            tmp_board[row][last-1:col] = tmp_board[row][last:col+1]
-            tmp_board[row][col] = ' '
-            self._board = self._transpose_matrix(tmp_board)
+            tmp_board_positions[row][last-1:col] = tmp_board_positions[row][last:col+1]
+            tmp_board_positions[row][col] = ' '
+            self._board_positions = self._transpose_matrix(tmp_board_positions)
 
         self._update_winner_state()
 
         if not bonus_turn:
             self._turn = self._get_opponent_name(player_name)
+
+        if self._debug:
+            print('Coordinates', row, col, 'Direction', direction)
+            self._board.display(colored=True)
         return True
 
     def _transpose_matrix(self, matrix):
@@ -293,7 +303,7 @@ class KubaGame:
         :param coordinates: tuple (row, col) where row and column are indices 
                             between 0 and 6
         """
-        marble = self._board[coordinates[0]][coordinates[1]]
+        marble = self._board_positions[coordinates[0]][coordinates[1]]
         if marble == ' ':
             return 'X'
         else:
@@ -304,7 +314,7 @@ class KubaGame:
         Returns tuple (W, B, R) of marble counts on the board
         """
         W, B, R = 0, 0, 0
-        for row in self._board:
+        for row in self._board_positions:
             W += row.count('W')
             B += row.count('B')
             R += row.count('R')
@@ -312,7 +322,7 @@ class KubaGame:
 
 if __name__ == '__main__':
     game = KubaGame(('ann', 'W'), ('bob', 'B'))
-    game._display_board(colored=True)
+    game._board.display(colored=True)
     print('marble count', game.get_marble_count())
 
     # game.make_move('ann', (5, 6), 'L')
