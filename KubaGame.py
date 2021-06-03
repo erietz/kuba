@@ -11,24 +11,53 @@
 # TODO: print row and col numbers on non-colored display board
 # TODO: check all requirements in README
 
-class Colors:
-    """Contains labels for escape sequences to print strings in color"""
-    BLACKBG  = '\33[40m'
-    WHITEBG  = '\33[47m'
-    REDBG    = '\33[41m'
-    ENDC     = '\033[0m'
+
+class KubaPlayer:
+    def __init__(self, player_info):
+        self._name = player_info[0]
+        self._color = player_info[1]
+        self._captured_count = 0
+
+    def get_name(self):
+        return self._name
+
+    def get_color(self):
+        return self._color
+
+    def get_captured_count(self):
+        return self._captured_count
+
+    def increment_captured_count(self):
+        self._captured_count += 1
+
 
 class KubaBoard:
-    def __init__(self):
-        self.board = [
-            ['W', 'W', ' ', ' ', ' ', 'B', 'B'],
-            ['W', 'W', ' ', 'R', ' ', 'B', 'B'],
-            [' ', ' ', 'R', 'R', 'R', ' ', ' '],
-            [' ', 'R', 'R', 'R', 'R', 'R', ' '],
-            [' ', ' ', 'R', 'R', 'R', ' ', ' '],
-            ['B', 'B', ' ', 'R', ' ', 'W', 'W'],
-            ['B', 'B', ' ', ' ', ' ', 'W', 'W'],
-        ]
+    def __init__(self, clone=None):
+        self._BLACKBG  = '\33[40m'
+        self._WHITEBG  = '\33[47m'
+        self._REDBG    = '\33[41m'
+        self._ENDC     = '\033[0m'
+        if clone is None:
+            self.board = [
+                ['W', 'W', ' ', ' ', ' ', 'B', 'B'],
+                ['W', 'W', ' ', 'R', ' ', 'B', 'B'],
+                [' ', ' ', 'R', 'R', 'R', ' ', ' '],
+                [' ', 'R', 'R', 'R', 'R', 'R', ' '],
+                [' ', ' ', 'R', 'R', 'R', ' ', ' '],
+                ['B', 'B', ' ', 'R', ' ', 'W', 'W'],
+                ['B', 'B', ' ', ' ', ' ', 'W', 'W'],
+            ]
+        else:
+            self.clone_board(self, clone)
+
+    def clone_board(self, board):
+        new_board = []
+        for row in board:
+            new_row = []
+            for marble in row:
+                new_row.append(marble)
+            new_board.append(new_row)
+        self.board = new_board
 
     def display(self, colored=False):
         """
@@ -53,11 +82,11 @@ class KubaBoard:
             new_row = []
             for column in row:
                 if column == 'W':
-                    new_row.append(Colors.WHITEBG + 'W' + Colors.ENDC)
+                    new_row.append(self._WHITEBG + 'W' + self._ENDC)
                 elif column == 'B':
-                    new_row.append(Colors.BLACKBG + 'B' + Colors.ENDC)
+                    new_row.append(self._BLACKBG + 'B' + self._ENDC)
                 elif column == 'R':
-                    new_row.append(Colors.REDBG + 'R' + Colors.ENDC)
+                    new_row.append(self._REDBG + 'R' + self._ENDC)
                 else:
                     new_row.append(' ')
             new_board.append(new_row)
