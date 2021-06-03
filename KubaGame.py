@@ -2,7 +2,6 @@
 # Date        : 2021-05-24
 # Description : Contains a class called KubaGame for playing a game of Kuba
 
-# TODO: DO NOT ALLOW PLAYERS TO GET ANOTHER TURN!!!!!
 # TODO: player currently wins game by getting 7 total balls (R or opponent)
 # TODO: prevent player from reversing opponents move
 # TODO: clean up the make_move function so less redundant code
@@ -10,7 +9,6 @@
 # TODO: make the Colors class part of KubaGame
 # TODO: print row and col numbers on non-colored display board
 # TODO: check all requirements in README
-
 
 class KubaPlayer:
     def __init__(self, player_info):
@@ -58,6 +56,13 @@ class KubaBoard:
                 new_row.append(marble)
             new_board.append(new_row)
         self.board = new_board
+
+    def get_marble(self, coordinates):
+        marble = self.board[coordinates[0]][coordinates[1]]
+        if marble == ' ':
+            return 'X'
+        else:
+            return marble
 
     def get_marble_count(self):
         """
@@ -140,47 +145,25 @@ class KubaGame:
         self._turn = None       # Name of player whose turn it is
         self._winner = None     # Name of player who wins the game
         self._board = KubaBoard()
-        self._debug = False
-        self._debug_color = False
+
+        # TODO: delete me
+        self._debug = False     # Will print board after each move if True
+        self._debug_color = False   # Will print board in color if True
 
     def get_current_turn(self):
         """Returns the players name whose turn it is"""
         return self._turn
 
-    def make_move(self, player_name, coordinates, direction):
-        """
-        :param player_name: Name of the player used to initially create the
-                            object
-
-        :param coordinates: Tuple of coordinates of the board (x, y) of the
-                            marble to push. Indices x and y range from 0 to 7.
-
-        :param direction:   Direction to push the balls. Valid options are 'L'
-                            (left), 'R' (right), 'F' (forward), and 'B' (back).
-
-        :return Boolean:    True if the move is made and False if the move is
-                            invalid (i.e. make_move did not do anything).
-        """
-        players_turn = self._turn
-        if players_turn is None:    # First move of the game
-            self._turn = player_name
-            players_turn = player_name
-        row, col = coordinates[0], coordinates[1]   # To reduce typing and brain power
-        ball_color = self._board.board[row][col]
-        player = self._player_info.get(player_name)
-        opponent = self._player_info.get(self._get_opponent_name(player_name))
-
-        #-----------------------------------------------------------------------
-        # Check to see if the move is valid
-        #-----------------------------------------------------------------------
-        if players_turn != player_name:     # Trying to make_move out of turn
+    def _validate_move(self, player, row, col, direction):
+        if self._turn != player.get_name(): # Trying to make_move out of turn
             return False
         if self._winner != None:            # A player has already won
             return False
-        for coordinate in coordinates:      # The coordinates are out of range
+        for coordinate in (row, col):      # The coordinates are out of range
             if coordinate not in range(7):
                 return False
-        if ball_color != player.get_color():   # Can only push using players balls
+        # Can only push using players balls
+        if self._board.board[row][col] != player.get_color():
             return False
 
         # There is a ball in front of the ball trying to be pushed
@@ -213,9 +196,46 @@ class KubaGame:
             if row in range(6) and self._board.board[row + 1][col] != ' ':
                 return False
 
-        #-----------------------------------------------------------------------
-        # Move is valid so update the board and states of the game
-        #-----------------------------------------------------------------------
+        return True
+
+    def _move_right(self, board, row, col):
+        pass
+
+    def _move_backward(self, board, row, col):
+        pass
+
+    def _move_left(self, board, row, col):
+        pass
+
+    def _move_forward(self, board, row, col):
+        pass
+
+
+    def make_move(self, player_name, coordinates, direction):
+        """
+        :param player_name: Name of the player used to initially create the
+                            object
+
+        :param coordinates: Tuple of coordinates of the board (row, col) of the
+                            marble to push. Indices row and col range from 0 to
+                            7.
+
+        :param direction:   Direction to push the balls. Valid options are 'L'
+                            (left), 'R' (right), 'F' (forward), and 'B' (back).
+
+        :return Boolean:    True if the move is made and False if the move is
+                            invalid (i.e. make_move did not do anything).
+        """
+        if self._turn is None:                      # First move of the game
+            self._turn = player_name
+        row, col = coordinates[0], coordinates[1]   # To reduce typing and brain power
+        player = self._player_info[player_name]
+        #opponent = self._player_info[self._get_opponent_name(player_name)]
+
+        move_is_valid = self._validate_move(player, row, col, direction)
+        if not move_is_valid:
+            return False
+
         if direction == 'R':
             try:
                 last = self._board.board[row].index(' ', col + 1) - 1
@@ -272,7 +292,8 @@ class KubaGame:
 
         self._update_winner_state()
 
-        self._turn = opponent.get_name()
+        #self._turn = opponent.get_name()
+        self._turn = self._get_opponent_name(player_name)
 
         if self._debug:
             print('Player:', player_name)
@@ -330,11 +351,7 @@ class KubaGame:
         :param coordinates: tuple (row, col) where row and column are indices 
                             between 0 and 6
         """
-        marble = self._board.board[coordinates[0]][coordinates[1]]
-        if marble == ' ':
-            return 'X'
-        else:
-            return marble
+        return self._board.get_marble(coordinates)
 
     def get_marble_count(self):
         return self._board.get_marble_count()
