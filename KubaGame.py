@@ -145,7 +145,7 @@ class KubaGame:
         self._turn = None       # Name of player whose turn it is
         self._winner = None     # Name of player who wins the game
         self._board = KubaBoard()
-        self._old_board_states = [KubaBoard().board, KubaBoard().board]
+        self._old_board_states = [KubaBoard().board]
 
         # TODO: delete me
         self._debug = False     # Will print board after each move if True
@@ -204,7 +204,9 @@ class KubaGame:
         try:
             last_marble = board[row].index(' ', col + 1) - 1
         except ValueError:
-            last_marble = 6
+            last_marble = 5
+            #last_marble = 6
+            # leads to crazy result if pushing off index 6 using index 5
 
         board[row][col+1:last_marble+2] = board[row][col:last_marble+1]
         board[row][col] = ' '
@@ -271,7 +273,7 @@ class KubaGame:
         elif direction == 'F':
             new_board = self._move_forward(self._board.board, row, col, player)
 
-        if new_board == self._old_board_states[-2]:
+        if new_board == self._old_board_states[-1]:
             return False
         else:
             self._old_board_states.append(self._board.board)
@@ -290,6 +292,7 @@ class KubaGame:
             print('Coordinates:', row, col)
             print('Direction:', direction)
             self._board.display(colored=self._debug_color)
+
         return True
 
     def _transpose_matrix(self, matrix):
@@ -344,6 +347,9 @@ class KubaGame:
         return self._board.get_marble(coordinates)
 
     def get_marble_count(self):
+        """
+        Returns tuple (W, B, R) of marble counts on the board
+        """
         return self._board.get_marble_count()
 
 if __name__ == '__main__':
