@@ -327,7 +327,7 @@ class KubaGame:
         marble_count = self.get_marble_count()
         if self._player_info[self._turn].get_captured_count() == 7:
             self._winner = self._turn
-        elif marble_count[0] == 0 or marble_count[2] == 0:
+        elif marble_count[0] == 0 or marble_count[1] == 0:
             self._winner = self._turn
 
     def get_winner(self):
