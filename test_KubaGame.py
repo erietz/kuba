@@ -1,13 +1,19 @@
 import unittest
-from KubaGame import KubaGame
+from KubaGame import KubaGame, KubaBoard, KubaPlayer
 
-# TODO: Case where white knocks off all black balls and vice versa
 # TODO: Case where there are no valid moves left for a player
 # TODO: Case where the opponent cannot counteract a move indefinitely
+
+class testKubaBoard(unittest.TestCase):
+    pass
+
+class testKubaPlayer(unittest.TestCase):
+    pass
 
 class TestKubaGame(unittest.TestCase):
 
     def test_readme_example(self):
+        # TODO: does get_captured change the turn???????
         game = KubaGame(('PlayerA', 'W'), ('PlayerB', 'B'))
         self.assertEqual(game.get_marble_count(), (8,8,13))
         self.assertEqual(game.get_captured('PlayerA'), 0)
