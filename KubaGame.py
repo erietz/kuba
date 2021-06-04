@@ -2,13 +2,9 @@
 # Date        : 2021-05-24
 # Description : Contains a class called KubaGame for playing a game of Kuba
 
-# TODO: player currently wins game by getting 7 total balls (R or opponent)
-# TODO: prevent player from reversing opponents move
-# TODO: clean up the make_move function so less redundant code
 # TODO: write unittests for each method 
-# TODO: make the Colors class part of KubaGame
-# TODO: print row and col numbers on non-colored display board
 # TODO: check all requirements in README
+# TODO: add all docstrings
 
 class KubaPlayer:
     def __init__(self, player_info):
@@ -119,6 +115,7 @@ class KubaBoard:
             print('|', end=' ')
             print()
         print('  ', '-'*16)
+
 
 class KubaGame:
     """
@@ -351,42 +348,3 @@ class KubaGame:
         Returns tuple (W, B, R) of marble counts on the board
         """
         return self._board.get_marble_count()
-
-if __name__ == '__main__':
-    game = KubaGame(('ann', 'W'), ('bob', 'B'))
-    game._board.display(colored=True)
-    print('marble count', game.get_marble_count())
-    print(game._get_opponent_name('ann'))
-
-    # game.make_move('ann', (5, 6), 'L')
-    # game._display_board(colored=True)
-    # game.make_move('bob', (6, 0), 'R')
-    # game._display_board(colored=True)
-    # game.make_move('ann', (5, 5), 'L')
-    # game._display_board(colored=True)
-    # game.make_move('bob', (6, 1), 'R')
-    # game._display_board(colored=True)
-    # game.make_move('ann', (5, 4), 'L')
-    # game._display_board(colored=True)
-
-#     print(game.make_move('ann', (0,0), 'R'))
-#     game._display_board(colored=True)
-#     print(game.make_move('bob', (6,0), 'R'))
-#     game._display_board(colored=True)
-#     print(game.make_move('ann', (0,1), 'R'))
-#     game._display_board(colored=True)
-#     print(game.make_move('bob', (6,1), 'R'))
-#     game._display_board(colored=True)
-#     print(game.make_move('ann', (0,2), 'R'))
-#     game._display_board(colored=True)
-#     print(game.make_move('bob', (6,2), 'R'))
-#     game._display_board(colored=True)
-#     print(game.make_move('ann', (0,3), 'R'))
-#     game._display_board(colored=True)
-#     print(game.make_move('bob', (6,3), 'R'))
-#     game._display_board(colored=True)
-#     print('ann captured', game.get_captured('ann'))
-#     game.make_move('ann', (0,4), 'R')
-#     game._display_board(colored=True)
-#     print('ann captured', game.get_captured('ann'))
-#     print('bob captured', game.get_captured('bob'))
