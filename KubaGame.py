@@ -46,7 +46,7 @@ class KubaBoard:
                 ['B', 'B', ' ', ' ', ' ', 'W', 'W'],
             ]
         else:
-            self.clone_board(self, clone)
+            self.clone_board(clone)
 
     def clone_board(self, board):
         new_board = []
@@ -145,6 +145,7 @@ class KubaGame:
         self._turn = None       # Name of player whose turn it is
         self._winner = None     # Name of player who wins the game
         self._board = KubaBoard()
+        self._old_board_states = [KubaBoard().board, KubaBoard().board]
 
         # TODO: delete me
         self._debug = False     # Will print board after each move if True
@@ -198,18 +199,41 @@ class KubaGame:
 
         return True
 
-    def _move_right(self, board, row, col):
-        pass
+    def _move_right(self, board, row, col, player):
+        board = KubaBoard(board).board
+        try:
+            last_marble = board[row].index(' ', col + 1) - 1
+        except ValueError:
+            last_marble = 6
 
-    def _move_backward(self, board, row, col):
-        pass
+        board[row][col+1:last_marble+2] = board[row][col:last_marble+1]
+        board[row][col] = ' '
+        return board
 
-    def _move_left(self, board, row, col):
-        pass
+    def _move_backward(self, board, row, col, player):
+        tmp_board = self._transpose_matrix(board)
+        tmp_board = self._move_right(tmp_board, col, row, player)
+        tmp_board = self._transpose_matrix(tmp_board)
+        return tmp_board
 
-    def _move_forward(self, board, row, col):
-        pass
+    def _move_left(self, board, row, col, player):
+        board = KubaBoard(board).board
+        rev_col = 7 - col - 1
+        try:
+            last = board[row][::-1].index(' ', rev_col + 1) - 1
+            last = 7 - last - 1     # want index of list not reversed list
+        except ValueError:
+            last = 1
 
+        board[row][last-1:col] = board[row][last:col+1]
+        board[row][col] = ' '
+        return board
+
+    def _move_forward(self, board, row, col, player):
+        tmp_board = self._transpose_matrix(board)
+        tmp_board = self._move_left(tmp_board, col, row, player)
+        tmp_board = self._transpose_matrix(tmp_board)
+        return tmp_board
 
     def make_move(self, player_name, coordinates, direction):
         """
@@ -236,59 +260,25 @@ class KubaGame:
         if not move_is_valid:
             return False
 
+        red_count = self._board.get_marble_count()[2]
+
         if direction == 'R':
-            try:
-                last = self._board.board[row].index(' ', col + 1) - 1
-            except ValueError:
-                last = 5
-                if self._board.board[row][6] == 'R':
-                    player.increment_captured_count()
-
-            self._board.board[row][col+1:last+2] = self._board.board[row][col:last+1]
-            self._board.board[row][col] = ' '
-
+            new_board = self._move_right(self._board.board, row, col, player)
         elif direction == 'L':
-            rev_col = 7 - col - 1
-            try:
-                last = self._board.board[row][::-1].index(' ', rev_col + 1) - 1
-                last = 7 - last - 1     # want index of list not reversed list
-            except ValueError:
-                last = 1
-                if self._board.board[row][0] == 'R':
-                    player.increment_captured_count()
-
-            self._board.board[row][last-1:col] = self._board.board[row][last:col+1]
-            self._board.board[row][col] = ' '
-
+            new_board = self._move_left(self._board.board, row, col, player)
         elif direction == 'B':
-            row, col = col, row
-            tmp_board_positions = self._transpose_matrix(self._board.board)
-            try:
-                last = tmp_board_positions[row].index(' ', col + 1) - 1
-            except ValueError:
-                last = 5
-                if tmp_board_positions[row][6] == 'R':
-                    player.increment_captured_count()
-
-            tmp_board_positions[row][col+1:last+2] = tmp_board_positions[row][col:last+1]
-            tmp_board_positions[row][col] = ' '
-            self._board.board = self._transpose_matrix(tmp_board_positions)
-
+            new_board = self._move_backward(self._board.board, row, col, player)
         elif direction == 'F':
-            tmp_board_positions = self._transpose_matrix(self._board.board)
-            row, col = col, row
-            rev_col = 7 - col - 1
-            try:
-                last = tmp_board_positions[row][::-1].index(' ', rev_col + 1) - 1
-                last = 7 - last - 1     # want index of list not reversed list
-            except ValueError:
-                last = 1
-                if tmp_board_positions[row][0] == 'R':
-                    player.increment_captured_count()
+            new_board = self._move_forward(self._board.board, row, col, player)
 
-            tmp_board_positions[row][last-1:col] = tmp_board_positions[row][last:col+1]
-            tmp_board_positions[row][col] = ' '
-            self._board.board = self._transpose_matrix(tmp_board_positions)
+        if new_board == self._old_board_states[-2]:
+            return False
+        else:
+            self._old_board_states.append(self._board.board)
+            self._board = KubaBoard(new_board)
+
+        if red_count > self._board.get_marble_count()[2]:
+            player.increment_captured_count()
 
         self._update_winner_state()
 
