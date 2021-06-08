@@ -6,7 +6,7 @@ p2_name = input('Player 2 Name: ').strip()
 p2_color = input('Player 2 color (W or B): ').upper()
 
 game = KubaGame((p1_name, p1_color), (p2_name, p2_color))
-game._display_board(colored=True)
+game._board.display(colored=True)
 
 def get_name():
     name = input('name: ').strip()
@@ -48,7 +48,7 @@ while game.get_winner() == None:
         if not move:
             print('move not valid')
         else:
-            game._display_board(colored=True)
+            game._board.display(colored=True)
             p1_score = game.get_captured(p1_name)
             p2_score = game.get_captured(p2_name)
             new_sum = p1_score + p2_score
