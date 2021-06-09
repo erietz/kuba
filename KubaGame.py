@@ -4,10 +4,10 @@
 #   Contains a class named KubaGame for playing a slightly modified version of
 #   the game of Kuba. For instructions on how to play, see
 #   https://sites.google.com/site/boardandpieces/list-of-games/kuba or watch
-#   this video: https://www.youtube.com/watch?v=XglqkfzsXYc play the game.
-#   KubaGame is composed of the KubaPlayer and KubaBoard classes and differs
-#   from the original board game by not allowing players to continue making
-#   moves after pushing off a marble.
+#   this video: https://www.youtube.com/watch?v=XglqkfzsXYc to learn how to
+#   play the game.  KubaGame is composed of the KubaPlayer and KubaBoard
+#   classes and differs from the original board game by not allowing players to
+#   continue making moves after pushing off a marble.
 
 class KubaPlayer:
     """
@@ -328,7 +328,6 @@ class KubaGame:
             self._turn = player_name
         row, col = coordinates[0], coordinates[1]   # To reduce typing and brain power
         player = self._player_info[player_name]
-        #opponent = self._player_info[self._get_opponent_name(player_name)]
 
         move_is_valid = self._validate_move(player, row, col, direction)
         if not move_is_valid:

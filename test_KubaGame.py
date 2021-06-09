@@ -242,10 +242,6 @@ class TestKubaGame(unittest.TestCase):
         self.assertTrue(game.make_move('ann', (3,6), 'L'))
         self.assertFalse(game.make_move('bob', (3,0), 'R'))
 
-
-    # def test_lose_by_move_moves_left(self):
-    #     pass
-
     def test_transpose_matrix(self):
         game = KubaGame(('ann', 'W'), ('bob', 'B'))
         matrix = [
