@@ -1,32 +1,67 @@
 # Author      : Ethan Rietz
-# Date        : 2021-05-24
-# Description : Contains a class called KubaGame for playing a game of Kuba
-
-# TODO: write unittests for each method 
-# TODO: check all requirements in README
-# TODO: add all docstrings
+# Date        : 2021-06-09
+# Description : 
+#   Contains a class named KubaGame for playing a slightly modified version of
+#   the game of Kuba. For instructions on how to play, see
+#   https://sites.google.com/site/boardandpieces/list-of-games/kuba or watch
+#   this video: https://www.youtube.com/watch?v=XglqkfzsXYc play the game.
+#   KubaGame is composed of the KubaPlayer and KubaBoard classes and differs
+#   from the original board game by not allowing players to continue making
+#   moves after pushing off a marble.
 
 class KubaPlayer:
+    """
+    Represents one of the two players in a game of Kuba. Has data members to
+    hold the players name, color, and red marble captured count. This class
+    also contains a method to increase the captured count by one marble.
+    """
     def __init__(self, player_info):
+        """
+        Creates a player using player_info and initializes their captured count
+        to zero.
+
+        :param player_info: A tuple (name, color) used to identify the player.
+                            Name and color are both strings and the color can
+                            either be white (W) or black (B).
+        """
         self._name = player_info[0]
         self._color = player_info[1]
         self._captured_count = 0
 
     def get_name(self):
+        """Returns the name of the player"""
         return self._name
 
     def get_color(self):
+        """Returns the color of the player"""
         return self._color
 
     def get_captured_count(self):
+        """Returns the number of red marbles captured by the player"""
         return self._captured_count
 
     def increment_captured_count(self):
+        """Increases the number of red marbles captured by the player by 1"""
         self._captured_count += 1
 
 
 class KubaBoard:
+    """
+    Represents a 7x7 board that a game of Kuba is played on. This class has
+    methods to initialize its board from clone operation, get the marble at a
+    specifed coordinate, get a count of all the marbles on the board, and to
+    display the board with or without color.
+    """
     def __init__(self, clone=None):
+        """
+        Creates a new KubaBoard.
+
+        If the clone argument is left out, the board will be initialized like a
+        traditional game of Kuba with 8 white and black marbles and 13 red
+        marbles. If clone is provided, it should be a 7x7 grid (list of lists)
+        of marbles ('W', 'B', 'R', and ' ' for empty positions).
+        """
+        # for printing the board in color
         self._BLACKBG  = '\33[40m'
         self._WHITEBG  = '\33[47m'
         self._REDBG    = '\33[41m'
@@ -45,6 +80,12 @@ class KubaBoard:
             self.clone_board(clone)
 
     def clone_board(self, board):
+        """
+        Sets the board data member to board by copying the list of lists.
+
+        :param board: 7x7 grid (list of lists) of marbles ('W', 'B', 'R', and
+                      ' ' for empty positions).
+        """
         new_board = []
         for row in board:
             new_row = []
@@ -54,6 +95,11 @@ class KubaBoard:
         self.board = new_board
 
     def get_marble(self, coordinates):
+        """
+        Returns the marble at coordinates
+
+        :param coordinates: A tuple (row, col) of indicis on the board
+        """
         marble = self.board[coordinates[0]][coordinates[1]]
         if marble == ' ':
             return 'X'
@@ -153,6 +199,11 @@ class KubaGame:
         return self._turn
 
     def _validate_move(self, player, row, col, direction):
+        """
+        Used internally to check if the move is valid.
+
+        :return Boolean: False if move cannot be made, otherwise True
+        """
         if self._turn != player.get_name(): # Trying to make_move out of turn
             return False
         if self._winner != None:            # A player has already won
@@ -197,26 +248,46 @@ class KubaGame:
         return True
 
     def _move_right(self, board, row, col, player):
+        """
+        Used internally to push a row of marbles to the right starting at
+        coordinates row and col for a player. If a marble is at row 6, the
+        marble will be pushed off of the board. Returns a copy of a board.
+        """
         board = KubaBoard(board).board
         try:
-            last_marble = board[row].index(' ', col + 1) - 1
+            # last = index of last marble being pushed
+            last = board[row].index(' ', col + 1) - 1
         except ValueError:
-            last_marble = 5
-            #last_marble = 6
-            # leads to crazy result if pushing off index 6 using index 5
+            # If there are no spaces between first marble and end of board, set
+            # the last marble to be 5, or the last possible marble that could
+            # be pushed.
+            last = 5
 
-        board[row][col+1:last_marble+2] = board[row][col:last_marble+1]
+        board[row][col+1:last+2] = board[row][col:last+1]
         board[row][col] = ' '
         return board
 
     def _move_backward(self, board, row, col, player):
+        """
+        Used internally to push a column of marbles backwards. Note: moving
+        backwards is exactly the same as moving right but with a transposed
+        board and reversing the row and column indices. Returns a copy of a
+        board.
+        """
         tmp_board = self._transpose_matrix(board)
         tmp_board = self._move_right(tmp_board, col, row, player)
         tmp_board = self._transpose_matrix(tmp_board)
         return tmp_board
 
     def _move_left(self, board, row, col, player):
+        """
+        Used internally to push a row of marbles to the left starting at
+        coordinates row and col for a player. If a marble is at row 0, the
+        marble will be pushed off of the board. Returns a copy of a board.
+        """
         board = KubaBoard(board).board
+        # Here we are reversing a list and rev_col represents the index of the
+        # column after reversing the row. See _move_right if confused.
         rev_col = 7 - col - 1
         try:
             last = board[row][::-1].index(' ', rev_col + 1) - 1
@@ -229,6 +300,11 @@ class KubaGame:
         return board
 
     def _move_forward(self, board, row, col, player):
+        """
+        Used internally to push a column of marbles forwards. Note: moving
+        forwards is exactly the same as moving left but with a transposed board
+        and reversing the row and column indices. Returns a copy of a board.
+        """
         tmp_board = self._transpose_matrix(board)
         tmp_board = self._move_left(tmp_board, col, row, player)
         tmp_board = self._transpose_matrix(tmp_board)
@@ -281,7 +357,6 @@ class KubaGame:
 
         self._update_winner_state()
 
-        #self._turn = opponent.get_name()
         self._turn = self._get_opponent_name(player_name)
 
         if self._debug:
@@ -307,7 +382,7 @@ class KubaGame:
         return new_matrix
 
     def _get_opponent_name(self, player_name):
-        """Returns the name of the player whose turn it is NOT"""
+        """Returns the name of the player who is not player_name"""
         players = list(self._player_info.keys())
         index = players.index(player_name)
         if index == 0:
@@ -338,7 +413,8 @@ class KubaGame:
     def get_marble(self, coordinates):
         """
         Returns the color of the marble located at coordinates
-        :param coordinates: tuple (row, col) where row and column are indices 
+
+        :param coordinates: tuple (row, col) where row and column are indices
                             between 0 and 6
         """
         return self._board.get_marble(coordinates)

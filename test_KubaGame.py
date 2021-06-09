@@ -1,19 +1,50 @@
+# Author      : Ethan Rietz
+# Date        : 2021-06-09
+# Description : Unittests for the KubaGame.py file. Run using make test.
+
 import unittest
 from KubaGame import KubaGame, KubaBoard, KubaPlayer
 
-# TODO: Case where there are no valid moves left for a player
-# TODO: Case where the opponent cannot counteract a move indefinitely
-
 class testKubaBoard(unittest.TestCase):
-    pass
+    def test_clone(self):
+        original_board = [ ['R' for _ in range(7)] for _ in range(7) ]
+        board = KubaBoard()
+        cloned_board = KubaBoard(original_board)
+        self.assertNotEqual(board.board, original_board)
+        self.assertEqual(original_board, cloned_board.board)
 
-class testKubaPlayer(unittest.TestCase):
-    pass
+        original_board = [ [' ' for _ in range(7)] for _ in range(7) ]
+        cloned_board = KubaBoard(original_board)
+        self.assertEqual(original_board, cloned_board.board)
+
+    def test_marble_count(self):
+        board = KubaBoard()
+        self.assertEqual(board.get_marble_count(), (8, 8, 13))
+
+    def test_get_marble(self):
+        board = KubaBoard()
+        self.assertEqual(board.get_marble((0, 0)), 'W')
+        self.assertEqual(board.get_marble((3, 0)), 'X')
+        self.assertEqual(board.get_marble((3, 1)), 'R')
+        self.assertEqual(board.get_marble((3, 5)), 'R')
+        self.assertEqual(board.get_marble((3, 6)), 'X')
+        self.assertEqual(board.get_marble((6, 5)), 'W')
+        self.assertEqual(board.get_marble((6, 6)), 'W')
+        self.assertEqual(board.get_marble((6, 0)), 'B')
+        self.assertEqual(board.get_marble((5, 1)), 'B')
+
+class TestKubaPlayer(unittest.TestCase):
+    def test_player(self):
+        p1 = KubaPlayer(('ethan', 'B'))
+        self.assertEqual(p1.get_name(), 'ethan')
+        self.assertEqual(p1.get_color(), 'B')
+        self.assertEqual(p1.get_captured_count(), 0)
+        self.assertIsNone(p1.increment_captured_count())
+        self.assertEqual(p1.get_captured_count(), 1)
 
 class TestKubaGame(unittest.TestCase):
 
     def test_readme_example(self):
-        # TODO: does get_captured change the turn???????
         game = KubaGame(('PlayerA', 'W'), ('PlayerB', 'B'))
         self.assertEqual(game.get_marble_count(), (8,8,13))
         self.assertEqual(game.get_captured('PlayerA'), 0)
@@ -67,9 +98,9 @@ class TestKubaGame(unittest.TestCase):
 
     def test_bob_wins_by_killing_ann(self):
         game = KubaGame(('ann', 'W'), ('bob', 'B'))
-        #game._debug = True
-        #game._debug_color = True
-        #game._board.display(colored=True)
+        game._debug = True
+        game._debug_color = True
+        game._board.display(colored=True)
         self.assertTrue(game.make_move('bob', (6, 0), 'F'))
         self.assertTrue(game.make_move('ann', (0, 0), 'B'))
         self.assertTrue(game.make_move('bob', (5, 0), 'F'))
@@ -102,7 +133,6 @@ class TestKubaGame(unittest.TestCase):
         self.assertEqual(game.get_marble_count(), (3,8,13))
         self.assertTrue(game.make_move('ann', (4, 5), 'F'))
         self.assertEqual(game.get_marble_count(), (3,7,13))
-        # TODO: is this undoing a move or not????
         self.assertTrue(game.make_move('bob', (0, 5), 'B'))
         self.assertTrue(game.make_move('ann', (6, 6), 'F'))
         self.assertTrue(game.make_move('bob', (1, 5), 'B'))
@@ -133,9 +163,9 @@ class TestKubaGame(unittest.TestCase):
 
     def test_ann_wins_by_killing_bob(self):
         game = KubaGame(('ann', 'W'), ('bob', 'B'))
-        game._debug = True
-        game._debug_color = True
-        game._board.display(colored=True)
+        #game._debug = True
+        #game._debug_color = True
+        #game._board.display(colored=True)
         self.assertTrue(game.make_move('ann', (0,0), 'B'))
         self.assertTrue(game.make_move('bob', (0,6), 'B'))
         self.assertTrue(game.make_move('ann', (1,0), 'B'))
@@ -189,10 +219,32 @@ class TestKubaGame(unittest.TestCase):
         self.assertEqual(game.get_winner(), 'ann')
 
     def test_cant_undo_move(self):
-        pass
+        game = KubaGame(('ann', 'W'), ('bob', 'B'))
+        #game._debug = True
+        #game._debug_color = True
+        #game._board.display(colored=True)
+        self.assertTrue(game.make_move('ann', (0,0), 'B'))
+        self.assertTrue(game.make_move('bob', (6,0), 'F'))
+        self.assertTrue(game.make_move('ann', (1,0), 'B'))
+        self.assertTrue(game.make_move('bob', (5,0), 'F'))
+        self.assertFalse(game.make_move('ann', (1,0), 'B'))
+        self.assertTrue(game.make_move('ann', (6,6), 'F'))
+        self.assertTrue(game.make_move('bob', (0,6), 'B'))
+        self.assertTrue(game.make_move('ann', (5,6), 'F'))
+        self.assertTrue(game.make_move('bob', (1,6), 'B'))
+        self.assertFalse(game.make_move('ann', (5,6), 'F'))
+        self.assertTrue(game.make_move('ann', (6,5), 'F'))
+        self.assertTrue(game.make_move('bob', (0,5), 'B'))
+        self.assertTrue(game.make_move('ann', (5,6), 'F'))
+        self.assertTrue(game.make_move('bob', (3,0), 'R'))
+        self.assertTrue(game.make_move('ann', (4,6), 'F'))
+        self.assertTrue(game.make_move('bob', (1,5), 'B'))
+        self.assertTrue(game.make_move('ann', (3,6), 'L'))
+        self.assertFalse(game.make_move('bob', (3,0), 'R'))
 
-    def test_lose_by_move_moves_left(self):
-        pass
+
+    # def test_lose_by_move_moves_left(self):
+    #     pass
 
     def test_transpose_matrix(self):
         game = KubaGame(('ann', 'W'), ('bob', 'B'))
