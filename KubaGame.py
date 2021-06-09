@@ -188,9 +188,8 @@ class KubaGame:
         self._turn = None       # Name of player whose turn it is
         self._winner = None     # Name of player who wins the game
         self._board = KubaBoard()
-        self._old_board_states = [KubaBoard().board]
+        self._old_board = KubaBoard()
 
-        # TODO: delete me
         self._debug = False     # Will print board after each move if True
         self._debug_color = False   # Will print board in color if True
 
@@ -346,10 +345,10 @@ class KubaGame:
         elif direction == 'F':
             new_board = self._move_forward(self._board.board, row, col, player)
 
-        if new_board == self._old_board_states[-1]:
+        if new_board == self._old_board.board:
             return False
         else:
-            self._old_board_states.append(self._board.board)
+            self._old_board = KubaBoard(self._board.board)
             self._board = KubaBoard(new_board)
 
         if red_count > self._board.get_marble_count()[2]:
